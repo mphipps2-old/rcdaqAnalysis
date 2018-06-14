@@ -1,0 +1,12 @@
+#! /bin/sh
+
+
+beg=$1
+end=$2
+inc=$3
+
+for ((fileNum=beg; fileNum <= end; fileNum+=inc)); do  
+f=$(printf '/data/gem/tpcBoardXrayScan/Run2_000000%d-0000.evt' $fileNum)
+root -b -q 'ProcessRawData.C("'$f'")'
+#sleep 40
+done

@@ -1,0 +1,18 @@
+void ShiftHisto(TH1F* h) {
+
+  for (int i = 0; i < 1024; ++i) {
+    float ADC = h->GetBinContent(i+1);
+    h->SetBinContent(i+1-150,ADC);
+  }
+  h->GetXaxis()->SetRangeUser(0,300);
+  h->GetYaxis()->SetTitle("ADC");
+  h->GetXaxis()->SetTitle("Time (1 ns)");
+  h->SetLineColor(2);
+  h->Draw();
+
+  tex = new TLatex(0.4912563,0.86,"#splitline{ATLAS Internal}{E_{Pb}: 150A GeV}");                 
+  tex->SetNDC();                                                                                  
+  tex->SetTextFont(73);                                                                           
+  tex->SetTextSize(28);                                                                           
+  tex->Draw();  
+}

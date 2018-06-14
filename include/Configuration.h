@@ -1,0 +1,116 @@
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
+
+#include <TSystem.h>
+#include <TString.h>
+#include <TObjArray.h>
+#include <TIterator.h>
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <utility>
+#include <TObjString.h>
+#include <TObject.h>
+
+using namespace std;
+
+class Configuration : public TObject {
+
+  public:
+    Configuration(TString configFile);
+    Configuration(int i=0) {;}
+    ~Configuration();
+    inline TString GetRunName() {return fRunName;}
+    inline TString GetPedType() {return fPedType;}
+    inline Int_t GetNSigma() {return fNSigma;}
+    inline Int_t GetNChannels() {return fNChannels;}
+    inline Int_t GetNTimeBins() {return fNTimeBins;}
+    inline Int_t GetNPackets() {return fNPackets;}
+    inline TString GetDAQSystem() {return fDAQ;}
+    inline TString GetCutType() {return fCutType;}
+    inline Int_t GetBinaryCut() {return fBinaryCut;}
+    inline Int_t GetBaseline() {return fBaseline;}
+    inline TString GetChargeMethod() {return fChargeMethod;}
+    inline Int_t GetGausFitStripCut() {return fGausStripCut;}
+    inline Int_t GetGausFitChi2Cut() {return fGausChi2Cut;}
+    inline Int_t GetGausFitClusterSizeCut() {return fGausClustSizeCut;}
+    inline Int_t GetNRowsX() {return fNRowsX;}
+    inline Int_t GetNRowsY() {return fNRowsY;}
+    inline Int_t GetNDevices() {return fNDevices;}
+    inline Int_t GetMaxClustSize() {return fMaxClustSize;}
+    inline Int_t GetTimeBinSize() {return fTimeBinSize;}
+    inline Int_t GetXPitch() {return fPitchX;}
+    inline Int_t GetDevNum() {return fDevNum;}
+    inline Int_t GetMinHitSize() {return fMinHitSize;}
+    inline TString GetInvertSignal() {return fInvertSignal;}
+    inline TString GetGaussianCorrection() {return fGaussianCorrection;}
+    inline TString GetRawPedMeanFile() {return fRawPedMeanFile;}
+    inline TString GetRawPedRMSFile() {return fRawPedRMSFile;}
+    inline TString GetPedMeanFile() {return fPedMeanFile;}
+    inline TString GetPedRMSFile() {return fPedRMSFile;}
+    inline TString GetRunMode() {return fRunMode;}
+    inline TString GetTreeDir() {return fTTrees;}
+    inline TString GetHistoDir() {return fTHistos;}
+    inline TString GetOutputTrees() {return fOutputTrees;}
+    inline TString GetOutputHistos() {return fOutputHistos;}
+    inline TString GetCalibrationFile() {return fCalibrationFile;}
+    inline TString GetChannelCalibration() {return fChCalibration;}
+    inline TString GetMappingFile() {return fMappingFile;}
+    inline TString GetDeviceMappingFile() {return fDeviceMappingFile;}
+    inline TString GetTreeDirectory() {return fTreeDirectory;}
+    inline TString GetDRSTrn() {return fDRSTrn;}
+    inline pair<Int_t,Int_t> GetOnlinePedRange() {pair<Int_t,Int_t> pedRange; pedRange = make_pair(fFirstOnlinePedTB,fLastOnlinePedTB); return pedRange;}
+    void Load(char* configFile) ;
+
+
+  private:
+    TString fPedType;
+    TString fRunName;
+    TString fTreeDirectory;
+    TString fInvertSignal;
+    Int_t fNSigma;
+    Int_t fTimeBinSize;
+    Int_t fBaseline;
+    Int_t fNPackets;
+    Int_t fNTimeBins;
+    Int_t fNChannels;
+    Int_t fNRowsX;
+    Int_t fNRowsY;
+    Int_t fPitchX;
+    Int_t fNDevices;
+    Int_t fNDimensions;
+    Int_t fGausStripCut;
+    Int_t fGausChi2Cut;
+    Int_t fDevNum;
+    Int_t fMinHitSize;
+    Int_t fGausClustSizeCut;
+    TString fDAQ;
+    TString fCutType;
+    Int_t fBinaryCut;
+    TString fChargeMethod;
+    Int_t fMaxClustSize;
+    TString fDRSTrn;
+    TString fChCalibration;
+    TString fCalibrationFile;
+    TString fMappingFile;
+    TString fDeviceMappingFile;
+    TString fGaussianCorrection;
+    TString fRawPedMeanFile;
+    TString fRawPedRMSFile;
+    TString fPedMeanFile;
+    TString fPedRMSFile;
+    TString fRunMode;
+    TString fTTrees;
+    TString fTHistos;
+    TString fOutputTrees;
+    TString fOutputHistos;
+    Int_t fFirstOnlinePedTB;
+    Int_t fLastOnlinePedTB;
+
+  ClassDef(Configuration,1)
+};
+
+#endif
+

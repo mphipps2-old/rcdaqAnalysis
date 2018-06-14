@@ -1,0 +1,130 @@
+######################################################################
+#  General Run Parameters                                            #
+#  TimeBinSize represents bin size in ns                             #
+#  Find way to run shell script in root to create this file          #
+#  Run Modes: PEDESTAL, MONITORING, ANALYSIS                         #
+#  Pedestal Mode: writes offline peds to root file                   #
+#  Montoring Mode: produces histograms                               #
+#  DAQ: SRS, DRS4, DRS32, STRUCK, BEAMTEST                           #
+#  Analysis Mode: produces trees                                     #
+#  Time Bin Size in ns                                               # 
+#  Pitch in um                                                       #
+#  NChannels: per device                                             #
+#  Note: when switching to DRS remember there's a difference b/w     #
+#  DRS4 and DRS32 in DAQ device and remember to switch mapping       # 
+#  to DRS specific mapping file                                      #
+#  DRSTRN: can be "TR0","TR1","BOTH", or "NONE". This allows data    #
+#  stream of drs fast group triggers. Must use the mcx trn port on   #
+#  the module. If you select the DRSTRN make sure you add an extra   #
+#  channel or two to the NCHANNELS row.                              #
+#  NPACKETS: rcdaq separates each readout device into different      #
+#  packets.                                                          #
+#  FIRSTPACKETNUMBER: assumes that packets are set sequentially.     #
+#  Could also use a mapping file for this in future to hard code     #
+#  a large number of packets                                         #
+######################################################################
+
+RUNNAME               ZDCLab
+RUNMODE               MONITORING
+DAQ                   DRS4
+NREADOUTDEVICES       1
+NTIMEBINS             1024
+NCHANNELS             1
+NROWSX                1
+NROWSY                1
+BASELINE              200
+TIMEBINSIZE           1
+XPITCH                1
+CHANNELCALIBRATION    NO
+DRSTRN                TR0
+INVERTSIGNAL          YES
+DEVICENUMBER          0
+NPACKETS              1
+NBITS                 10
+
+######################################################################
+#  Set Cut Parameters (zero suppression cut)                                    
+#  ANALOG: RMS * NSIGMA
+#  BINARY: Static ADC Cut
+#  MINHITSIZE: minimum timebin width of expected pulses (cut applied)
+######################################################################
+
+CUTTYPE        ANALOG
+NSIGMA         5
+#CUTTYPE       BINARY
+BINARYCUT      75
+MINHITSIZE     30
+
+######################################################################
+#  Set Hit Parameters (charge definition)                            #
+#  PeakBin: Charge set from timebin of max charge                    #
+#  AverageBin: average over peak timebin and two neighbors           #
+#  IntegralCharge: integral across all timebins above threshold      #
+######################################################################
+
+#CHARGEMETHOD   PeakBin
+CHARGEMETHOD    AverageBin
+#CHARGEMETHOD   IntegralCharge
+
+######################################################################
+#  Set Cluster Parameters                                            #
+#  Gaussian correction: Fit clusters larger than 2 strips to Gaussian#
+#      and use mean as centroid, unless difference b/w arithmetic    #
+#      mean and Gaussian mean > 1 pitch length                       #
+#  Gaus Strip Cut: Acceptable strip length difference between        #
+#       arithmetic centroid and fit centroid. If the mean of the fit #
+#       is greater than (for example) 1 strip from arithmetic        #
+#       centroid then we use the arithmetic centroid.                #
+#  Gaus Chi2 Cut: Acceptable reduced chi^2 of the centroid fit. If   #
+#       chi^2 greater than cut value then arithmetic centroid used   #
+#  Gaus Cluster Size Cut: Cluster size must be greater than that     #
+#       value in order to attempt centroid fit.                      #
+######################################################################
+
+MAXCLUSTERSIZE           100
+GAUSSIANCORRECTION       NO
+GAUSSTRIPCUT             1
+GAUSCLUSTERSIZECUT       2
+
+######################################################################
+#  Setup Input Files                                                 #
+#  Ped file only needed if using offline pedestal corrections        #
+#  Calibration file normalizes ADC in each readout device. Should be #
+#        a text file with 2 columns: padNo and calibration const     #
+#  Mapping file should be a text file with 4 columns: channel,       #
+#        padNo, X coord, and y coord. If readout is 1d, padNo will   #
+#        equal X coord and y coord = 0. Start number from 0.         #
+######################################################################
+
+PEDMEANFILE       ~/Analysis/Peds/PedMeanZDCBeam.root
+PEDRMSFILE	  ~/Analysis/Peds/PedRMSZDCBeam.root
+CALIBFILE         ~/rcdaqAnalysis/CalibrationFiles/calibrationSRS.txt
+MAPPINGFILE        ~/rcdaqAnalysis/MappingFiles/ZDCBeamTestMapping.txt
+DEVICEMAPPINGFILE  ~/rcdaqAnalysis/MappingFiles/DeviceMapping.txt
+TREEDIRECTORY      ~/Analysis/Trees/ZDCBeamTest
+
+######################################################################
+#  Setup Outputs (Turn on/off tree/histo output here)                #
+#  TREESTYLE (Could be "Traditional" or "Hits"                       #
+#  TRADITIONAL: Trees formatted as Event <stl::vector> -- way it's   #
+#  usually done in LHC analysis                                      #
+#  HITS: Trees formatted as Hits, Clusters and Events in which a hit #
+#  is any channel above threshold, cluster is a grouping of hits and #
+#  event has event-wide info                                         #
+######################################################################
+
+OUTPUTTREES	YES
+TREESTYLE       TRADITIONAL
+OUTPUTHISTOS	YES
+
+#####################################################################
+# Set Pedestal Parameters                                            #
+# Acceptable Ped Types: "ONLINEPEDESTAL" AND "OFFLINEPEDESTAL"       #
+# Numbering convention: start from 0 and first and last ped time bin #
+#      are included in the range                                     #
+######################################################################
+
+PEDTYPE	                   ONLINEPEDESTAL
+#PEDTYPE                   OFFLINEPEDESTAL
+FIRSTONLINEPEDTIMEBIN   5
+LASTONLINEPEDTIMEBIN    200

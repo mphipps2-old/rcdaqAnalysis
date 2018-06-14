@@ -1,0 +1,15 @@
+#include <iostream>
+
+void EventDisplay(TH2F *h2) {
+  .L libAnalysis.so;
+  rcdaq_open();
+  bool loop = 1;
+  while (loop) {
+    prun(1);
+    h2->Draw("lego2");
+    cin >> loop;
+  }
+}
+
+
+

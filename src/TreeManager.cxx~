@@ -1,0 +1,83 @@
+#include "TreeManager.h"
+ClassImp(TreeManager);
+
+TreeManager::TreeManager(Configuration *config) {
+  cout << " initializing tree " << endl;
+  fOutputTrees = config->GetOutputTrees();
+  InitRootFile();
+  fRunName = config->GetRunName();
+  fDirectoryName = config->GetTreeDirectory();
+  fNStrips = config->GetNChannels();
+  fNDevices = config->GetNDevices();
+  fNTimeBins = config->GetNTimeBins();
+  cout << " tree initialization done" << endl;
+}
+//====================================================================================================================
+TreeManager::~TreeManager() {
+    delete fStripTree;
+}
+
+//===================================================================================================================
+
+void TreeManager::Reset() {
+  fStripTree->Reset();
+}
+
+//====================================================================================================================
+
+// Called in TreeManager()
+void TreeManager::InitRootFile() { 
+  fStripTree = new TTree("Strip","Strip") ;
+  fStripTree->Branch("XRowNo", "std::vector<Int_t>", &fXRowNo_v);
+  fStripTree->Branch("YRowNo", "std::vector<Int_t>", &fYRowNo_v);
+  fStripTree->Branch("StripNo","std::vector<Int_t>",&fStripNo_v);
+  fStripTree->Branch("EventNo", &fStripEventNo);
+  fStripTree->Branch("TimeSize","std::vector<int>", &fTimeSize_v);
+  fStripTree->Branch("MaxCharge","std::vector<float>", &fPeakStripCharge_v);
+  fStripTree->Branch("AvgCharge","std::vector<float>", &fAvgStripCharge_v);
+  fStripTree->Branch("IntCharge","std::vector<float>", &fIntStripCharge_v);
+  fStripTree->Branch("MaxTimeBin", "std::vector<Int_t>",&fMaxTimeBin_v);
+  fStripTree->Branch("Saturation","std::vector<Bool_t>", &fSaturation_v);
+  fStripTree->Branch("PedMean","std::vector<float>", &fPedMean_v);
+  fStripTree->Branch("PedRMS","std::vector<float>", &fPedRMS_v);
+  for( int c = 0; c < fNDevices*fNStrips; c++ ){
+    fRawTimeBinCharge_vv[c].resize(fNTimeBins);
+    fTimeBinCharge_vv[c].resize(fNTimeBins);
+    //    std::cout << "       channel " << c << std::endl;
+    fStripTree->Branch( Form( "c%d", c), "std::vector<float>", &fRawTimeBinCharge_vv[c] );
+    fStripTree->Branch( Form( "c%d", c), "std::vector<float>", &fTimeBinCharge_vv[c] );
+    //  fStripTree->Branch("Time_v", "vector<Float_t>", &fTime_v);
+  }
+}
+
+//====================================================================================================================
+// Called in FillRootFile()
+void TreeManager::FillObjectsInRoot(Processor *processor) {
+  fProcessor = processor;
+  for(Int_t stripNb = 0; stripNb < fNStrips; stripNb++) {       
+      fTimeSize_v[stripNb] = fHit->GetHitSizeTime();
+      fPeakStripCharge_v[stripNb] = fHit->GetMaxCharge();
+      fAvgStripCharge_v[stripNb] = fHit->GetAvgCharge();
+      fIntStripCharge_v[stripNb] = fHit->GetIntegralCharge();
+      fMaxTimeBin_v[stripNb] = fHit->GetMaxTimeBin();
+      fSaturation_v[stripNb] = fHit->GetSaturation();
+      fPedMean_v[stripNb] = fHit->GetPedMean();
+      fPedRMS_v[stripNb] = fHit->GetPedRMS();
+      fTimeBinCharge_vv[stripNb] = fHit->GetTimeBinCharges();
+      fRawTimeBinCharge_vv[stripNb] = fHit->GetRawTimeBinCharges();
+  }
+  fStripTree->Fill();
+}
+
+
+//====================================================================================================================
+void TreeManager::WriteRootFile() {
+  char fileName[256];
+  sprintf(fileName,"%s/Tree%sRun%d.root",fDirectoryName.Data(),fRunName.Data(), fProcessor->GetRunNum());
+  if (fOutputTrees.EqualTo("YES",TString::kIgnoreCase))  fFile = TFile::Open(fileName,"RECREATE");
+  fFile->cd();
+  fStripTree->Write();
+  gDirectory->pwd(); 
+  fFile->Close();
+  gROOT->cd(0);
+}

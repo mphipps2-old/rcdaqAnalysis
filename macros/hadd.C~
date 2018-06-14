@@ -1,0 +1,8 @@
+void hadd(int nEvents) {
+  TH2F* hadd = new TH2F(*SingleEventST);
+    for(int i=0; i<nEvents; i++){
+      prun(1); hadd->Add(SingleEventST);
+    }
+  hadd->Draw("colz");
+
+}
